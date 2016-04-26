@@ -158,21 +158,23 @@ module Rpush
         def notification_to_xml
           title         = (@notification.data['title'] || '').to_s
           body          = (@notification.data['body'] || '').to_s
-          launch        = (@notification.data['launch'] || '').to_s
+          launch        = { launch: (@notification.data['launch'] || '').to_json }
           banner_url    = (@notification.data['banner_url'] || '').to_s
 
-          launch_string = launch.present? ? " launch='#{clean_param_string(launch)}'" : ''
-          banner_string = banner_url.present? ? "<image id='1' src='#{clean_param_string(banner_url)}' />" : ''
+          builder = Nokogiri::XML::Builder.new do |xml|
+            xml.toast(launch) do
+              xml.visual do
+                xml.binding(template: 'ToastImageAndText02') do
+                  xml.text_(title, id: '1')
+                  xml.text_(body, id: '2') if body.present?
 
-          "<toast#{launch_string}>
-            <visual version='1' lang='en-US'>
-              <binding template='ToastImageAndText02'>
-                <text id='1'>#{clean_param_string(title)}</text>
-                <text id='2'>#{clean_param_string(body)}</text>
-                #{banner_string}
-              </binding>
-            </visual>
-          </toast>"
+                  xml.image(id: '1', src: banner_url) if banner_url.present?
+                end
+              end
+            end
+          end
+
+          builder.to_xml
         end
 
         def clean_param_string(string)
