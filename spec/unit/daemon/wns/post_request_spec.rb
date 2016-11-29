@@ -114,4 +114,30 @@ describe Rpush::Daemon::Wns::PostRequest do
       expect(request.body).to include('42')
     end
   end
+
+  context 'ToastImageNotification' do
+    let(:notification) do
+      Rpush::Wns::ToastImageNotification.create!(
+        app: app,
+        uri: 'http://some.example',
+        data: {
+          title: 'MyApp',
+          body: 'Example notification',
+          image: 'http://samp.le/try.png',
+          launch: 'MyLaunchArgument'
+        },
+        sound: 'ms-appx:///examplesound.wav'
+      )
+    end
+
+    it 'creates a request characteristic for toast image notification with launch and sound' do
+      request = Rpush::Daemon::Wns::PostRequest.create(notification, 'token')
+      expect(request['X-WNS-Type']).to eq('wns/toast')
+      expect(request['Content-Type']).to eq('text/xml')
+      expect(request.body).to include("<toast launch='MyLaunchArgument'>")
+      expect(request.body).to include('MyApp')
+      expect(request.body).to include('Example notification')
+      expect(request.body).to include("<audio src='ms-appx:///examplesound.wav'/>")
+    end
+  end
 end

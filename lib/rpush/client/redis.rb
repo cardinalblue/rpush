@@ -32,6 +32,7 @@ require 'rpush/client/redis/wpns/notification'
 
 require 'rpush/client/redis/wns/app'
 require 'rpush/client/redis/wns/notification'
+require 'rpush/client/redis/wns/toast_image_notification'
 require 'rpush/client/redis/wns/raw_notification'
 require 'rpush/client/redis/wns/badge_notification'
 
