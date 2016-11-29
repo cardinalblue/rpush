@@ -1,8 +1,46 @@
-## 2.6.0 (Unreleased)
+## 3.0.0 (unreleased)
 
 #### Features
 
-None yet.
+* Added support for APNS `mutable-content` ([#296](https://github.com/rpush/rpush/pull/296) by [@tdtran](https://github.com/tdtran))
+* Added support for HTTP2 base APNS Api ([#315](https://github.com/rpush/rpush/pull/315) by [@soulfly](https://github.com/soulfly) and [@Nattfodd](https://github.com/Nattfodd))
+
+#### Changes
+
+* Make synchronizer aware of GCM and WNS apps ([#254](https://github.com/rpush/rpush/pull/254) by [@wouterh](https://github.com/wouterh))
+* Precise after init commit msg ([#266](https://github.com/rpush/rpush/pull/266) by [@azranel](https://github.com/azranel))
+* Use new GCM endpoint ([#303](https://github.com/rpush/rpush/pull/303) by [@aried3r](https://github.com/aried3r))
+
+#### Bugfixes
+
+* ~~~Lock `net-http-persistent` dependency to `< 3`. See also [#306](https://github.com/rpush/rpush/issues/306) for more details. (by [@amaierhofer](https://github.com/amaierhofer))~~~
+* Fix `net-http-persistent` initializer to support version 2.x as well as 3.x. ([#309](https://github.com/rpush/rpush/pull/309) by [@amirmujkic](https://github.com/amirmujkic))
+
+## 2.7.0 (February 9, 2016)
+
+#### Features
+
+* Added support for GCM priorities. ([#243](https://github.com/rpush/rpush/pull/243) by [@aried3r](https://github.com/aried3r))
+* Added support for GCM notification payload ([#246](https://github.com/rpush/rpush/pull/246) by [@aried3r](https://github.com/aried3r))
+* Added support for Windows Raw Notifications (in JSON form) ([#238](https://github.com/rpush/rpush/pull/238) by [@mseppae](https://github.com/mseppae))
+* Added WNS badge notifications ([#247](https://github.com/rpush/rpush/pull/247) by [@wouterh](https://github.com/wouterh))
+* Added the `launch` argument of WNS toast notifications ([#247](https://github.com/rpush/rpush/pull/247) by [@wouterh](https://github.com/wouterh))
+* Added sound in WNS toast notifications ([#247](https://github.com/rpush/rpush/pull/247) by [@wouterh](https://github.com/wouterh))
+
+#### Changes
+
+* Change `alert` type from `string` to `text` in ActiveRecord to allow bigger alert dictionaries. ([#248](https://github.com/rpush/rpush/pull/248) by [@schmidt](https://github.com/schmidt))
+
+#### Fixes
+
+* Fixed issue where setting the `mdm` parameter broke `to_binary` for MDM APNs ([#234](https://github.com/rpush/rpush/pull/234) by [@troya2](https://github.com/troya2))
+* Fixed `as_json` ([#231](https://github.com/rpush/rpush/issues/231) by [@aried3r](https://github.com/aried3r))
+
+## 2.6.0 (January 25, 2016)
+
+#### Features
+
+* Added support for GCM for iOS' `content_available`. ([#221](https://github.com/rpush/rpush/pull/221))
 
 #### Fixes
 

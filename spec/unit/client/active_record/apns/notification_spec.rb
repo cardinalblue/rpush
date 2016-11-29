@@ -23,6 +23,17 @@ describe Rpush::Client::ActiveRecord::Apns::Notification do
     expect(notification.errors[:base].include?("APN notification cannot be larger than 2048 bytes. Try condensing your alert and device attributes.")).to be_truthy
   end
 
+  it "should store long alerts" do
+    notification.app = app
+    notification.device_token = "a" * 64
+    notification.alert = "*" * 300
+    expect(notification.valid?).to be_truthy
+
+    notification.save!
+    notification.reload
+    expect(notification.alert).to eq("*" * 300)
+  end
+
   it "should default the sound to 'default'" do
     expect(notification.sound).to eq('default')
   end
@@ -98,6 +109,11 @@ describe Rpush::Client::ActiveRecord::Apns::Notification, 'MDM' do
   let(:magic) { 'abc123' }
   let(:notification) { Rpush::Client::ActiveRecord::Apns::Notification.new }
 
+  before do
+    notification.device_token = "a" * 64
+    notification.id = 1234
+  end
+
   it 'includes the mdm magic in the payload' do
     notification.mdm = magic
     expect(notification.as_json).to eq('mdm' => magic)
@@ -107,6 +123,43 @@ describe Rpush::Client::ActiveRecord::Apns::Notification, 'MDM' do
     notification.alert = "i'm doomed"
     notification.mdm = magic
     expect(notification.as_json.key?('aps')).to be_falsey
+  end
+
+  it 'can be converted to binary' do
+    notification.mdm = magic
+    expect(notification.to_binary).to be_present
+  end
+end if active_record?
+
+describe Rpush::Client::ActiveRecord::Apns::Notification, 'mutable-content' do
+  let(:notification) { Rpush::Client::ActiveRecord::Apns::Notification.new }
+
+  it 'includes mutable-content in the payload' do
+    notification.mutable_content = true
+    expect(notification.as_json['aps']['mutable-content']).to eq 1
+  end
+
+  it 'does not include content-available in the payload if not set' do
+    expect(notification.as_json['aps'].key?('mutable-content')).to be_falsey
+  end
+
+  it 'does not include mutable-content as a non-aps attribute' do
+    notification.mutable_content = true
+    expect(notification.as_json.key?('mutable-content')).to be_falsey
+  end
+
+  it 'does not overwrite existing attributes for the device' do
+    notification.data = { hi: :mom }
+    notification.mutable_content = true
+    expect(notification.as_json['aps']['mutable-content']).to eq 1
+    expect(notification.as_json['hi']).to eq 'mom'
+  end
+
+  it 'does not overwrite the mutable-content flag when setting attributes for the device' do
+    notification.mutable_content = true
+    notification.data = { hi: :mom }
+    expect(notification.as_json['aps']['mutable-content']).to eq 1
+    expect(notification.as_json['hi']).to eq 'mom'
   end
 end if active_record?
 

@@ -21,6 +21,9 @@ require 'rpush/client/mongoid/apns/notification'
 require 'rpush/client/mongoid/apns/feedback'
 require 'rpush/client/mongoid/apns/app'
 
+require 'rpush/client/mongoid/apns2/notification'
+require 'rpush/client/mongoid/apns2/app'
+
 require 'rpush/client/mongoid/gcm/notification'
 require 'rpush/client/mongoid/gcm/app'
 
@@ -28,6 +31,8 @@ require 'rpush/client/mongoid/wpns/notification'
 require 'rpush/client/mongoid/wpns/app'
 
 require 'rpush/client/mongoid/wns/notification'
+require 'rpush/client/mongoid/wns/raw_notification'
+require 'rpush/client/mongoid/wns/badge_notification'
 require 'rpush/client/mongoid/wns/app'
 
 require 'rpush/client/mongoid/adm/notification'

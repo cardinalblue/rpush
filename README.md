@@ -1,4 +1,7 @@
 [![Gem Version](https://badge.fury.io/rb/rpush.svg)](http://badge.fury.io/rb/rpush)
+[![Build Status](https://travis-ci.org/rpush/rpush.svg?branch=master)](https://travis-ci.org/rpush/rpush)
+[![Test Coverage](https://codeclimate.com/github/rpush/rpush/badges/coverage.svg)](https://codeclimate.com/github/rpush/rpush)
+[![Code Climate](https://codeclimate.com/github/rpush/rpush/badges/gpa.svg)](https://codeclimate.com/github/rpush/rpush)
 [![Join the chat at https://gitter.im/rpush/rpush](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/rpush/rpush?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 <img src="https://raw.github.com/rpush/rpush/master/logo.png" align="right" width="200px" />
@@ -40,12 +43,14 @@ Initialize Rpush into your project. **Rails will be detected automatically.**
 
 ```sh
 $ cd /path/to/project
-$ rpush init
+$ bundle
+$ bundle exec rpush init
 ```
 
 ### Create an App & Notification
 
 #### Apple Push Notification Service
+
 
 If this is your first time using the APNs, you will need to generate SSL certificates. See [Generating Certificates](https://github.com/rpush/rpush/wiki/Generating-Certificates) for instructions.
 
@@ -72,6 +77,8 @@ The `url_args` attribute is available for Safari Push Notifications.
 
 You should also implement the [ssl_certificate_will_expire](https://github.com/rpush/rpush/wiki/Reflection-API) reflection to monitor when your certificate is due to expire.
 
+To use the newer APNs Api replace `Rpush::Apns::App` with `Rpush::Apns2::App`.
+
 #### Google Cloud Messaging
 
 ```ruby
@@ -87,10 +94,19 @@ n = Rpush::Gcm::Notification.new
 n.app = Rpush::Gcm::App.find_by_name("android_app")
 n.registration_ids = ["..."]
 n.data = { message: "hi mom!" }
+n.priority = 'high'        # Optional, can be either 'normal' or 'high'
+n.content_available = true # Optional
+# Optional notification payload. See the reference below for more keys you can use!
+n.notification = { body: 'great match!',
+                   title: 'Portugal vs. Denmark',
+                   icon: 'myicon'
+                 }
 n.save!
 ```
 
 GCM also requires you to respond to [Canonical IDs](https://github.com/rpush/rpush/wiki/Canonical-IDs).
+
+Check the [GCM reference](https://developers.google.com/cloud-messaging/http-server-ref#notification-payload-support) for what keys you can use and are available to you. **Note:** Not all are yet implemented in Rpush.
 
 #### Amazon Device Messaging
 
@@ -114,7 +130,9 @@ n.save!
 
 For more documentation on [ADM](https://developer.amazon.com/sdk/adm.html).
 
-#### Windows Phone Notification Service
+#### Windows Phone Notification Service (Windows Phone 8.0 and 7.x)
+
+Uses the older [Windows Phone 8 Toast template](https://msdn.microsoft.com/en-us/library/windows/apps/jj662938(v=vs.105).aspx)
 
 ```ruby
 app = Rpush::Wpns::App.new
@@ -130,6 +148,59 @@ n = Rpush::Wpns::Notification.new
 n.app = Rpush::Wpns::App.find_by_name("windows_phone_app")
 n.uri = "http://..."
 n.data = {title:"MyApp", body:"Hello world", param:"user_param1"}
+n.save!
+```
+
+#### Windows Notification Service (Windows 8.1, 10 Apps & Phone > 8.0)
+
+Uses the more recent [Toast template](https://msdn.microsoft.com/en-us/library/windows/apps/xaml/mt631604.aspx)
+
+The `client_id` here is the SID URL as seen [here](https://msdn.microsoft.com/en-us/library/windows/apps/hh465407.aspx#7-SIDandSecret). Do not confuse it with the `client_id` on dashboard.
+
+You can (optionally) include a launch argument by adding a `launch` key to the notification data.
+
+You can (optionally) include an [audio element](https://msdn.microsoft.com/en-us/library/windows/apps/xaml/br230842.aspx) by setting the sound on the notification.
+
+```ruby
+app = Rpush::Wns::App.new
+app.name = "windows_phone_app"
+app.client_id = YOUR_SID_URL
+app.client_secret = YOUR_CLIENT_SECRET
+app.connections = 1
+app.save!
+```
+
+```ruby
+n = Rpush::Wns::Notification.new
+n.app = Rpush::Wns::App.find_by_name("windows_phone_app")
+n.uri = "http://..."
+n.data = {title:"MyApp", body:"Hello world", launch:"launch-argument"}
+n.sound = "ms-appx:///mynotificationsound.wav"
+n.save!
+```
+
+#### Windows Raw Push Notifications
+
+Note: The data is passed as `.to_json` so only this format is supported, altough raw notifications are meant to support any kind of data.
+Current data structure enforces hashes and `.to_json` representation is natural presentation of it.
+
+```ruby
+n = Rpush::Wns::RawNotification.new
+n.app = Rpush::Wns::App.find_by_name("windows_phone_app")
+n.uri = 'http://...'
+n.data = { foo: 'foo', bar: 'bar' }
+n.save!
+```
+
+#### Windows Badge Push Notifications
+
+Uses the [badge template](https://msdn.microsoft.com/en-us/library/windows/apps/xaml/br212849.aspx) and the type `wns/badge`.
+
+```ruby
+n = Rpush::Wns::BadgeNotification.new
+n.app = Rpush::Wns::App.find_by_name("windows_phone_app")
+n.uri = 'http://...'
+n.badge = 4
 n.save!
 ```
 
@@ -230,7 +301,3 @@ mysql database.
 
 To switch between ActiveRecord and Redis, set the `CLIENT` environment variable to either `active_record`, `redis` or `mongoid`.
 
-
-[![Build Status](https://secure.travis-ci.org/rpush/rpush.svg?branch=master)](http://travis-ci.org/rpush/rpush)
-[![Test Coverage](https://codeclimate.com/github/rpush/rpush/badges/coverage.svg)](https://codeclimate.com/github/rpush/rpush)
-[![Code Climate](https://codeclimate.com/github/rpush/rpush/badges/gpa.svg)](https://codeclimate.com/github/rpush/rpush)

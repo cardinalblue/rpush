@@ -31,4 +31,37 @@ describe Rpush::Client::ActiveRecord::Gcm::Notification do
     notification.expiry = 100
     expect(notification.as_json['time_to_live']).to eq 100
   end
+
+  it 'includes content_available in the payload' do
+    notification.content_available = true
+    expect(notification.as_json['content_available']).to eq true
+  end
+
+  it 'sets the priority to high when set to high' do
+    notification.priority = 'high'
+    expect(notification.as_json['priority']).to eq 'high'
+  end
+
+  it 'sets the priority to normal when set to normal' do
+    notification.priority = 'normal'
+    expect(notification.as_json['priority']).to eq 'normal'
+  end
+
+  it 'validates the priority is either "normal" or "high"' do
+    notification.priority = 'invalid'
+    expect(notification.errors[:priority]).to eq ['must be one of either "normal" or "high"']
+  end
+
+  it 'excludes the priority if it is not defined' do
+    expect(notification.as_json).not_to have_key 'priority'
+  end
+
+  it 'includes the notification payload if defined' do
+    notification.notification = { key: 'any key is allowed' }
+    expect(notification.as_json).to have_key 'notification'
+  end
+
+  it 'excludes the notification payload if undefined' do
+    expect(notification.as_json).not_to have_key 'notification'
+  end
 end if active_record?

@@ -24,6 +24,7 @@ require 'rpush/daemon/dispatcher_loop'
 require 'rpush/daemon/dispatcher/http'
 require 'rpush/daemon/dispatcher/tcp'
 require 'rpush/daemon/dispatcher/apns_tcp'
+require 'rpush/daemon/dispatcher/apns_http2'
 require 'rpush/daemon/service_config_methods'
 require 'rpush/daemon/retry_header_parser'
 require 'rpush/daemon/ring_buffer'
@@ -40,12 +41,19 @@ require 'rpush/daemon/apns/delivery'
 require 'rpush/daemon/apns/feedback_receiver'
 require 'rpush/daemon/apns'
 
+require 'rpush/daemon/apns2/delivery'
+require 'rpush/daemon/apns2'
+
 require 'rpush/daemon/gcm/delivery'
 require 'rpush/daemon/gcm'
 
 require 'rpush/daemon/wpns/delivery'
 require 'rpush/daemon/wpns'
 
+require 'rpush/daemon/wns/post_request'
+require 'rpush/daemon/wns/raw_request'
+require 'rpush/daemon/wns/toast_request'
+require 'rpush/daemon/wns/badge_request'
 require 'rpush/daemon/wns/delivery'
 require 'rpush/daemon/wns'
 

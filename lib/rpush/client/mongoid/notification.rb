@@ -32,6 +32,9 @@ module Rpush
         field :priority, type: Integer
         field :url_args, type: Array
         field :category, type: String
+        field :content_available, type: Boolean, default: false
+        field :mutable_content, type: Boolean, default: false
+        field :notification, type: Hash
 
         field :integer_id, type: Integer
         increments :integer_id, model_name: name
