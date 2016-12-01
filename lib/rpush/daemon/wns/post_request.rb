@@ -9,6 +9,8 @@ module Rpush
             RawRequest.create(notification, access_token)
           elsif badge_notification?(notification)
             BadgeRequest.create(notification, access_token)
+          elsif toast_image_notification?(notification)
+            ToastImageRequest.create(notification, access_token)
           else
             ToastRequest.create(notification, access_token)
           end
@@ -22,6 +24,10 @@ module Rpush
 
         def self.badge_notification?(notification)
           notification.class.name.match(/BadgeNotification/)
+        end
+
+        def self.toast_image_notification?(notification)
+          notification.class.name.match(/ToastImageNotification/)
         end
 
         def self.stringify_keys(data)
