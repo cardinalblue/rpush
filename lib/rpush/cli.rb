@@ -124,7 +124,7 @@ module Rpush
         STDOUT.write "* Booting Rails '#{options[:rails_env]}' environment... "
         STDOUT.flush
         ENV['RAILS_ENV'] = options['rails_env']
-        require 'config/environment.rb'
+        require './config/environment.rb'
         Rpush.config.update(options)
         puts ANSI.green { '✔' }
 
