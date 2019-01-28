@@ -52,3 +52,8 @@ Rpush::Client::Redis::Notification.subclasses.each do |notification_class|
     self.namespace = Rpush::Client::Redis::Notification.namespace
   end
 end
+Rpush::Client::Redis::App.subclasses.each do |notification_class|
+  notification_class.class_eval do
+    self.namespace = Rpush::Client::Redis::App.namespace
+  end
+end
