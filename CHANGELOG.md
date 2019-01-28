@@ -1,4 +1,155 @@
-## 3.0.0 (unreleased)
+## HEAD
+
+### Breaking Changes
+
+- None
+
+### Added
+
+- None
+
+### Fixed
+
+- None
+
+## 3.3.1 (2018-11-14)
+
+When upgrading, don't forget to run `bundle exec rpush init` to get all the latest migrations.
+
+### Fixed
+
+- Remove validation of 64-characters length from `device_token`. [#463](https://github.com/rpush/rpush/pull/463) (by [@chrisokamoto](https://github.com/chrisokamoto)).
+
+## 3.3.0 (2018-11-14)
+
+When upgrading, don't forget to run `bundle exec rpush init` to get all the latest migrations.
+
+### Added
+
+- Added support for Apple Push Notification service `thread-id` field [#460](https://github.com/rpush/rpush/pull/460) (by [@gerard-morera](https://github.com/gerard-morera)).
+
+### Changes
+
+- Remove unused class `ConfigurationWithoutDefaults` [#461](https://github.com/rpush/rpush/pull/461) (by [@adis-io](https://github.com/adis-io)).
+
+## 3.2.4 (2018-10-25)
+
+When upgrading, don't forget to run `bundle exec rpush init` to get all the latest migrations.
+
+### Changes
+
+- Relaxed JWT dependency version [#447](https://github.com/rpush/rpush/pull/447) (by [@sposin](https://github.com/sposin)).
+
+### Docs
+
+- Better documentation for running tests when developing Rpush [#458](https://github.com/rpush/rpush/pull/458) (by [@jsantos](https://github.com/jsantos)).
+
+### Fixed
+
+- Change `apn_key` column type from string to text [#455](https://github.com/rpush/rpush/pull/455) (by [sonxurxo](https://github.com/sonxurxo)).
+- Retry all GCM 5xx errors [#456](https://github.com/rpush/rpush/pull/456) (by [@rofreg](https://github.com/rofreg)).
+
+## 3.2.3 (2018-07-12)
+
+### Changes
+
+- Update jwt dependency from 1.x to 2.x [#444](https://github.com/rpush/rpush/pull/444) (by [@jsantos](https://github.com/jsantos)).
+
+## 3.2.2 (2018-07-10)
+
+### Fixed
+
+- Migrations now work with Rails 5.2 and ActiveRecord. Redis support for Rails 5.2 is not yet working if you're using Modis, see [this issue](https://github.com/ileitch/modis/issues/13).
+
+## 3.2.1 (2018-07-10)
+
+### Fixed
+
+- A memory leak in the Rpush daemon which caused it to consume more and more memory was fixed. [#441](https://github.com/rpush/rpush/pull/441) (by [@armahmoudi](https://github.com/armahmoudi))
+
+## 3.2.0 (2018-06-13)
+
+When upgrading, don't forget to run `bundle exec rpush init` to get all the latest migrations.
+
+### Breaking Changes
+
+- None
+
+### Added
+
+- Added support for P8 certificate Apple push notifications [#386](https://github.com/rpush/rpush/pull/386) (by [@mariannegru](https://github.com/mariannegru))
+
+## 3.1.1 (2018-04-16)
+
+When upgrading, don't forget to run `bundle exec rpush init` to get all the latest migrations.
+
+### Breaking Changes
+
+- None
+
+### Added
+
+- None
+
+### Fixed
+
+- Database deadlock [#200](https://github.com/rpush/rpush/issues/200) (by [@loadhigh](https://github.com/loadhigh) in [#428](https://github.com/rpush/rpush/issues/428))
+
+### Enhancements
+
+- Change the index on `rpush_notifications` to minimize number of locked records and pre-sort the records ([#428](https://github.com/rpush/rpush/issues/428) by [@loadhigh](https://github.com/loadhigh))
+- Minimize the locking duration by moving the row dump code outside of the transaction ([#428](https://github.com/rpush/rpush/issues/428) by [@loadhigh](https://github.com/loadhigh))
+
+## 3.1.0 (2018-04-11)
+
+When upgrading, don't forget to run `bundle exec rpush init` to get all the latest migrations.
+
+### Breaking Changes
+
+- None
+
+### Added
+
+- Added sandbox URL to `ApnsHttp2` dispatcher ([#392](https://github.com/rpush/rpush/pull/392) by [@brianlittmann](https://github.com/brianlittmann))
+
+### Features
+
+- Added support for [Pushy](https://pushy.me/) ([#404](https://github.com/rpush/rpush/pull/404) by [@zabolotnov87](https://github.com/zabolotnov87))
+
+### Fixed
+
+- `@notification.app` triggers loading of association :app ([#410](https://github.com/rpush/rpush/issues/410) by [@loadhigh](https://github.com/loadhigh))
+- APNS expiry should be number of seconds since epoch ([#416](https://github.com/rpush/rpush/issues/416) by [@loadhigh](https://github.com/loadhigh))
+
+### Enhancements
+
+- Test rpush with Ruby 2.5 on Travis CI ([#407](https://github.com/rpush/rpush/pull/407) by [@Atul9](https://github.com/Atul9))
+
+## 3.0.2 (2018-01-08)
+
+#### Fixes
+
+* Fixes migrations added in 3.0.1 ([#396](https://github.com/rpush/rpush/pull/396) by [@grosser](https://github.com/grosser))
+* Actually run these migrations in the test suite ([#399](https://github.com/rpush/rpush/pull/399) by [@aried3r](https://github.com/aried3r))
+
+## 3.0.1 (2017-11-30)
+
+#### Enhancements
+
+* Reduce booleans to true/false, do not allow nil ([#384](https://github.com/rpush/rpush/pull/384)) by [@grosser](https://github.com/grosser)
+* Better error message for error 8 in APNS ([#387](https://github.com/rpush/rpush/pull/387/files)) by [@grosser](https://github.com/grosser)
+
+## 3.0.0 (2017-09-15)
+
+Same as 3.0.0.rc1 including:
+
+#### Features
+
+* Added support for latest modis version ([#378](https://github.com/rpush/rpush/pull/378)) by [@milgner](https://github.com/milgner)
+
+## 3.0.0.rc1 (2017-08-31)
+
+When upgrading, don't forget to run `bundle exec rpush init` to get all the latest migrations.
 
 #### Features
 
@@ -7,9 +158,15 @@
 
 #### Changes
 
+* **Breaking:** Dropped support for old Rubies and Rails versions. rpush 3.0 only supports Ruby versions 2.2.2 or higher and
+  Rails 4.2 or higher. ([#366](https://github.com/rpush/rpush/pull/366) by [@aried3r](https://github.com/aried3r))
+* **Breaking:** Dropped MongoDB support because there was no one maintaining it. But we're open to adding it back in. ([#366](https://github.com/rpush/rpush/pull/366) by [@aried3r](https://github.com/aried3r))
+* **Breaking:** Dropped JRuby support. ([#366](https://github.com/rpush/rpush/pull/366) by [@aried3r](https://github.com/aried3r))
+
 * Make synchronizer aware of GCM and WNS apps ([#254](https://github.com/rpush/rpush/pull/254) by [@wouterh](https://github.com/wouterh))
 * Precise after init commit msg ([#266](https://github.com/rpush/rpush/pull/266) by [@azranel](https://github.com/azranel))
 * Use new GCM endpoint ([#303](https://github.com/rpush/rpush/pull/303) by [@aried3r](https://github.com/aried3r))
+* Remove sound default value ([#320](https://github.com/rpush/rpush/pull/320) by [@amaierhofer](https://github.com/amaierhofer))
 
 #### Bugfixes
 

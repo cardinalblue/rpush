@@ -24,6 +24,7 @@ require 'rpush/daemon/dispatcher_loop'
 require 'rpush/daemon/dispatcher/http'
 require 'rpush/daemon/dispatcher/tcp'
 require 'rpush/daemon/dispatcher/apns_tcp'
+require 'rpush/daemon/dispatcher/apns_http2'
 require 'rpush/daemon/service_config_methods'
 require 'rpush/daemon/retry_header_parser'
 require 'rpush/daemon/ring_buffer'
@@ -39,6 +40,9 @@ require 'rpush/daemon/store/interface'
 require 'rpush/daemon/apns/delivery'
 require 'rpush/daemon/apns/feedback_receiver'
 require 'rpush/daemon/apns'
+
+require 'rpush/daemon/apns2/delivery'
+require 'rpush/daemon/apns2'
 
 require 'rpush/daemon/gcm/delivery'
 require 'rpush/daemon/gcm'
@@ -56,6 +60,9 @@ require 'rpush/daemon/wns'
 
 require 'rpush/daemon/adm/delivery'
 require 'rpush/daemon/adm'
+
+require 'rpush/daemon/pushy'
+require 'rpush/daemon/pushy/delivery'
 
 module Rpush
   module Daemon
@@ -103,9 +110,7 @@ module Rpush
     end
 
     def self.shutdown_lock
-      return @shutdown_lock if @shutdown_lock
-      @shutdown_lock = Mutex.new
-      @shutdown_lock
+      @shutdown_lock ||= Mutex.new
     end
 
     def self.common_init

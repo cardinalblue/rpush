@@ -15,7 +15,7 @@ module Rpush
           5 => 'Missing token size',
           6 => 'Missing topic size',
           7 => 'Missing payload size',
-          8 => 'Invalid token',
+          8 => 'Invalid device token',
           10 => 'APNs closed connection (possible maintenance)',
           255 => 'None (unknown error)'
         }
@@ -36,7 +36,7 @@ module Rpush
 
         def cleanup
           if Rpush.config.push
-            # In push mode only a single batch is sent, followed my immediate shutdown.
+            # In push mode only a single batch is sent, followed by immediate shutdown.
             # Allow the error receiver time to handle any errors.
             @reconnect_disabled = true
             sleep 1

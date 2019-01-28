@@ -1,4 +1,7 @@
 [![Gem Version](https://badge.fury.io/rb/rpush.svg)](http://badge.fury.io/rb/rpush)
+[![Build Status](https://travis-ci.org/rpush/rpush.svg?branch=master)](https://travis-ci.org/rpush/rpush)
+[![Test Coverage](https://codeclimate.com/github/rpush/rpush/badges/coverage.svg)](https://codeclimate.com/github/rpush/rpush)
+[![Code Climate](https://codeclimate.com/github/rpush/rpush/badges/gpa.svg)](https://codeclimate.com/github/rpush/rpush)
 [![Join the chat at https://gitter.im/rpush/rpush](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/rpush/rpush?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 <img src="https://raw.github.com/rpush/rpush/master/logo.png" align="right" width="200px" />
@@ -11,13 +14,14 @@ Rpush aims to be the *de facto* gem for sending push notifications in Ruby. Its 
 
   * [**Apple Push Notification Service**](#apple-push-notification-service)
     * Including Safari Push Notifications.
-  * [**Google Cloud Messaging**](#google-cloud-messaging)
+  * [**Firebase Cloud Messaging**](#firebase-cloud-messaging) (used to be Google Cloud Messaging)
   * [**Amazon Device Messaging**](#amazon-device-messaging)
   * [**Windows Phone Push Notification Service**](#windows-phone-notification-service)
+  * [**Pushy**](#pushy)
 
 #### Feature Highlights
 
-* Use [**ActiveRecord**](https://github.com/rpush/rpush/wiki/Using-ActiveRecord), [**Redis**](https://github.com/rpush/rpush/wiki/Using-Redis) or [**MongoDB**](https://github.com/rpush/rpush/wiki/Using-Mongodb) for storage.
+* Use [**ActiveRecord**](https://github.com/rpush/rpush/wiki/Using-ActiveRecord) or [**Redis**](https://github.com/rpush/rpush/wiki/Using-Redis) for storage.
 * Plugins for [**Bugsnag**](https://github.com/rpush/rpush-plugin-bugsnag),
 [**Sentry**](https://github.com/rpush/rpush-plugin-sentry), [**StatsD**](https://github.com/rpush/rpush-plugin-statsd) or [write your own](https://github.com/rpush/rpush/wiki/Writing-a-Plugin).
 * Seamless integration with your projects, including **Rails**.
@@ -25,7 +29,7 @@ Rpush aims to be the *de facto* gem for sending push notifications in Ruby. Its 
 * Scales vertically (threading) and horizontally (multiple processes).
 * Designed for uptime - new apps are loaded automatically, signal `HUP` to update running apps.
 * Hooks for fine-grained instrumentation and error handling ([Reflection API](https://github.com/rpush/rpush/wiki/Reflection-API)).
-* Works with **MRI**, **JRuby** and **Rubinius**.
+* Tested with **MRI**
 
 
 ### Getting Started
@@ -40,12 +44,14 @@ Initialize Rpush into your project. **Rails will be detected automatically.**
 
 ```sh
 $ cd /path/to/project
-$ rpush init
+$ bundle
+$ bundle exec rpush init
 ```
 
 ### Create an App & Notification
 
 #### Apple Push Notification Service
+
 
 If this is your first time using the APNs, you will need to generate SSL certificates. See [Generating Certificates](https://github.com/rpush/rpush/wiki/Generating-Certificates) for instructions.
 
@@ -53,7 +59,7 @@ If this is your first time using the APNs, you will need to generate SSL certifi
 app = Rpush::Apns::App.new
 app.name = "ios_app"
 app.certificate = File.read("/path/to/sandbox.pem")
-app.environment = "sandbox" # APNs environment.
+app.environment = "development" # APNs environment.
 app.password = "certificate password"
 app.connections = 1
 app.save!
@@ -72,7 +78,11 @@ The `url_args` attribute is available for Safari Push Notifications.
 
 You should also implement the [ssl_certificate_will_expire](https://github.com/rpush/rpush/wiki/Reflection-API) reflection to monitor when your certificate is due to expire.
 
-#### Google Cloud Messaging
+To use the newer APNs Api replace `Rpush::Apns::App` with `Rpush::Apns2::App`.
+
+#### Firebase Cloud Messaging
+
+FCM and GCM are – as of writing – compatible with each other. See also [this comment](https://github.com/rpush/rpush/issues/284#issuecomment-228330206) for further references.
 
 ```ruby
 app = Rpush::Gcm::App.new
@@ -97,9 +107,9 @@ n.notification = { body: 'great match!',
 n.save!
 ```
 
-GCM also requires you to respond to [Canonical IDs](https://github.com/rpush/rpush/wiki/Canonical-IDs).
+FCM also requires you to respond to [Canonical IDs](https://github.com/rpush/rpush/wiki/Canonical-IDs).
 
-Check the [GCM reference](https://developers.google.com/cloud-messaging/http-server-ref#notification-payload-support) for what keys you can use and are available to you. **Note:** Not all are yet implemented in Rpush.
+Check the [FCM reference](https://firebase.google.com/docs/cloud-messaging/http-server-ref#notification-payload-support) for what keys you can use and are available to you. **Note:** Not all are yet implemented in Rpush.
 
 #### Amazon Device Messaging
 
@@ -150,6 +160,10 @@ Uses the more recent [Toast template](https://msdn.microsoft.com/en-us/library/w
 
 The `client_id` here is the SID URL as seen [here](https://msdn.microsoft.com/en-us/library/windows/apps/hh465407.aspx#7-SIDandSecret). Do not confuse it with the `client_id` on dashboard.
 
+You can (optionally) include a launch argument by adding a `launch` key to the notification data.
+
+You can (optionally) include an [audio element](https://msdn.microsoft.com/en-us/library/windows/apps/xaml/br230842.aspx) by setting the sound on the notification.
+
 ```ruby
 app = Rpush::Wns::App.new
 app.name = "windows_phone_app"
@@ -163,7 +177,8 @@ app.save!
 n = Rpush::Wns::Notification.new
 n.app = Rpush::Wns::App.find_by_name("windows_phone_app")
 n.uri = "http://..."
-n.data = {title:"MyApp", body:"Hello world"}
+n.data = {title:"MyApp", body:"Hello world", launch:"launch-argument"}
+n.sound = "ms-appx:///mynotificationsound.wav"
 n.save!
 ```
 
@@ -179,6 +194,43 @@ n.uri = 'http://...'
 n.data = { foo: 'foo', bar: 'bar' }
 n.save!
 ```
+
+#### Windows Badge Push Notifications
+
+Uses the [badge template](https://msdn.microsoft.com/en-us/library/windows/apps/xaml/br212849.aspx) and the type `wns/badge`.
+
+```ruby
+n = Rpush::Wns::BadgeNotification.new
+n.app = Rpush::Wns::App.find_by_name("windows_phone_app")
+n.uri = 'http://...'
+n.badge = 4
+n.save!
+```
+
+#### Pushy
+
+[Pushy](https://pushy.me/) is a highly-reliable push notification gateway, based on [MQTT](https://pushy.me/support#what-is-mqtt) protocol for cross platform push notification delivery that includes web, Android, and iOS. One of its advantages is it allows for reliable notification delivery to Android devices in China where Google Cloud Messaging and Firebase Cloud Messaging are blocked and to custom hardware devices that use Android OS but are not using Google Play Services.
+
+Note: current implementation of Pushy only supports Android devices and does not include [subscriptions](https://pushy.me/docs/android/subscribe-topics).
+
+```ruby
+app = Rpush::Pushy::App.new
+app.name = "android_app"
+app.api_key = YOUR_API_KEY
+app.connections = 1
+app.save!
+```
+
+```ruby
+n = Rpush::Pushy::Notification.new
+n.app = Rpush::Pushy::App.find_by_name("android_app")
+n.registration_ids = ["..."]
+n.data = { message: "hi mom!"}
+n.time_to_live = 60 # seconds
+n.save!
+```
+
+For more documentation on [Pushy](https://pushy.me/docs).
 
 ### Running Rpush
 
@@ -260,7 +312,7 @@ You should run `rpush init` after upgrading Rpush to check for configuration and
 * [Why open multiple connections to the APNs?](https://github.com/rpush/rpush/wiki/Why-open-multiple-connections-to-the-APNs%3F)
 * [Silent failures might be dropped connections](https://github.com/rpush/rpush/wiki/Dropped-connections)
 
-### Google Cloud Messaging
+### Firebase Cloud Messaging
 * [Notification Options](https://github.com/rpush/rpush/wiki/GCM-Notification-Options)
 * [Canonical IDs](https://github.com/rpush/rpush/wiki/Canonical-IDs)
 * [Delivery Failures & Retries](https://github.com/rpush/rpush/wiki/Delivery-Failures-&-Retries)
@@ -275,9 +327,4 @@ Note that the database username is changed at runtime to be the currently logged
 with mysql and you're using a user named 'bob', you will need to grant a mysql user 'bob' access to the 'rpush_test'
 mysql database.
 
-To switch between ActiveRecord and Redis, set the `CLIENT` environment variable to either `active_record`, `redis` or `mongoid`.
-
-
-[![Build Status](https://secure.travis-ci.org/rpush/rpush.svg?branch=master)](http://travis-ci.org/rpush/rpush)
-[![Test Coverage](https://codeclimate.com/github/rpush/rpush/badges/coverage.svg)](https://codeclimate.com/github/rpush/rpush)
-[![Code Climate](https://codeclimate.com/github/rpush/rpush/badges/gpa.svg)](https://codeclimate.com/github/rpush/rpush)
+To switch between ActiveRecord and Redis, set the `CLIENT` environment variable to either `active_record` or `redis`.

@@ -77,7 +77,7 @@ module Rpush
       Rails::Generators.invoke('rpush_migration', ['--force']) if install_migrations
 
       puts "\n* #{ANSI.green { 'Next steps:' }}"
-      puts "  - Run 'db:migrate'." if install_migrations
+      puts "  - Run 'bundle exec rake db:migrate'." if install_migrations
       puts "  - Review and update your configuration in #{default_config_path}."
       puts "  - Create your first app, see https://github.com/rpush/rpush for examples."
       puts "  - Run 'rpush help' for commands and options."
@@ -153,7 +153,7 @@ module Rpush
     end
 
     def check_ruby_version
-      STDERR.puts(ANSI.yellow { 'WARNING: ' } + "You are using an old and unsupported version of Ruby.") if RUBY_VERSION <= '1.9.3' && RUBY_ENGINE == 'ruby'
+      STDERR.puts(ANSI.yellow { 'WARNING: ' } + "You are using an old and unsupported version of Ruby.") if RUBY_VERSION < '2.2.2' && RUBY_ENGINE == 'ruby'
     end
 
     def underscore_option_names

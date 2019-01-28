@@ -1,12 +1,12 @@
 module Rpush
   module Daemon
     module Gcm
-      # http://developer.android.com/guide/google/gcm/gcm.html#response
+      # https://firebase.google.com/docs/cloud-messaging/server
       class Delivery < Rpush::Daemon::Delivery
         include MultiJsonHelper
 
         host = 'https://fcm.googleapis.com'
-        GCM_URI = URI.parse("#{host}/fcm/send")
+        FCM_URI = URI.parse("#{host}/fcm/send")
         UNAVAILABLE_STATES = %w(Unavailable InternalServerError)
         INVALID_REGISTRATION_ID_STATES = %w(InvalidRegistration MismatchSenderId NotRegistered InvalidPackageName)
 
@@ -103,7 +103,7 @@ module Rpush
           attrs = { 'app_id' => @notification.app_id, 'collapse_key' => @notification.collapse_key, 'delay_while_idle' => @notification.delay_while_idle }
           registration_ids = @notification.registration_ids.values_at(*unavailable_idxs)
           Rpush::Daemon.store.create_gcm_notification(attrs, @notification.data,
-                                                      registration_ids, deliver_after_header(response), @notification.app)
+                                                      registration_ids, deliver_after_header(response), @app)
         end
 
         def bad_request
@@ -142,10 +142,10 @@ module Rpush
         end
 
         def do_post
-          post = Net::HTTP::Post.new(GCM_URI.path, 'Content-Type'  => 'application/json',
-                                                   'Authorization' => "key=#{@notification.app.auth_key}")
+          post = Net::HTTP::Post.new(FCM_URI.path, 'Content-Type'  => 'application/json',
+                                                   'Authorization' => "key=#{@app.auth_key}")
           post.body = @notification.as_json.to_json
-          @http.request(GCM_URI, post)
+          @http.request(FCM_URI, post)
         end
       end
 
