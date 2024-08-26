@@ -36,6 +36,7 @@ module Rpush
         protected
 
         def handle_response(response)
+          log_info("FCM response: #{response.inspect}")
           case response.code.to_i
           when 200
             ok
@@ -141,6 +142,7 @@ module Rpush
           post = Net::HTTP::Post.new(@uri.path, 'Content-Type' => 'application/json',
                                      'Authorization' => "Bearer #{token}")
           post.body = @notification.as_json.to_json
+          log_info("FCM request body: #{post.body}")
           @http.request(@uri, post)
         end
 
