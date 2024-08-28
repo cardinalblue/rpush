@@ -66,6 +66,32 @@ describe 'FCM' do
     expect(notification.delivered).to eq(false)
   end
 
+  it 'retries notification that fail due to TooManyRequests' do
+    # This is not the actual payload content for a 'too many requests' scenario,
+    # but it is enough to test the retry logic.
+    example_error_body = {
+      "error": {
+        "code": 429,
+        "message": "Too many requests were sent.",
+        "errors": [
+          {
+            "message": "Too many requests were sent",
+            "domain": "global",
+            "reason": "tooManyRequests"
+          }
+        ],
+        "status": "TOO_MANY_REQUESTS"
+      }
+    }.to_json
+
+    allow(response).to receive_messages(code: 429, body: example_error_body, header: {})
+    expect(notification.deliver_after).to be_nil
+    expect do
+      Rpush.push
+      notification.reload
+    end.to change(notification, :deliver_after).to(kind_of(Time))
+  end
+
   it 'retries notification that fail due to a SocketError' do
     expect(http).to receive(:request).and_raise(SocketError.new)
     expect(notification.deliver_after).to be_nil
