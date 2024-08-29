@@ -48,7 +48,7 @@ module Rpush
           when 404
             unregistered(response)
           when 429
-            too_many_requests
+            too_many_requests(response)
           when 500
             internal_server_error(response)
           when 502
@@ -86,8 +86,9 @@ module Rpush
           fail Rpush::DeliveryError.new(404, @notification.id, "Client was not registered for your app. (#{error})")
         end
 
-        def too_many_requests
-          fail Rpush::DeliveryError.new(429, @notification.id, 'Slow down. Too many requests were sent!')
+        def too_many_requests(response)
+          retry_delivery(@notification, response)
+          log_warn("FCM responded with a Too Many Requests. " + retry_message)
         end
 
         def internal_server_error(response)
